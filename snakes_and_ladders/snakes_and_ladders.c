@@ -110,12 +110,13 @@ int main () {
 		    dist[adj[i]] = tmpDist;
 		}
 	    }
-	    visited[currNode] = 1; //update visited array	    
+	    //update visited array
+	    visited[currNode] = 1;
 	    //obtain next node
 	    currNode = nextNode(visited, dist);
 	    if (currNode == -1) {
-		printf("error in minAdj");
-		return -1;
+		printf("%d\n", -1);
+		break;
 	    }
 	}
 	//print number of rolls
