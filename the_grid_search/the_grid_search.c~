@@ -1,0 +1,69 @@
+#include <math.h>
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <assert.h>
+#include <limits.h>
+#include <stdbool.h>
+
+int main(){
+    int t; 
+    scanf("%d",&t);
+    for(int a0 = 0; a0 < t; a0++){
+        int R; 
+        int C; 
+        scanf("%d %d",&R,&C);
+        char* G[R];
+        for(int G_i = 0; G_i < R; G_i++){
+           G[G_i] = (char *)malloc(1024 * sizeof(char));
+           scanf("%s",G[G_i]);
+        }
+        int r; 
+        int c; 
+        scanf("%d %d",&r,&c);
+        char* P[r];
+        for(int P_i = 0; P_i < r; P_i++){
+        P[P_i] = (char *)malloc(1024 * sizeof(char));
+        scanf("%s",P[P_i]);
+        }
+
+        //Locating pattern
+	int rrow;
+        int needle = 0;
+	//search for P[0]
+	for (rrow = 0; rrow < R; rrow++) {
+	    int col;
+	    for (col = 0; col < C; col++) {
+		int row;
+		char* coord = (char*) (G[rrow] + col*sizeof(char));
+		needle = 0;
+		if (strstr(coord, P[needle]) != NULL) {
+		    int offset = (int) (strstr(coord, P[needle]) - coord);
+		    for (row = rrow; row < R; row++) {
+			if (strstr(G[row] + offset, P[needle]) != NULL) {
+			    needle++;
+			} else {
+			    break;
+			}
+			if (needle == r) {
+			    printf("YES\n");
+			    break;
+			}
+		    }
+		    if (needle == r) {
+			break;
+		    }
+		}		
+	    }
+	    if (needle == r) {
+		break;
+	    }
+
+	}
+	if (needle != r) printf("NO\n");
+    }
+    
+    
+    return 0;
+}
+

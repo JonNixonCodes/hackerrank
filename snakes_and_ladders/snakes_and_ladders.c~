@@ -1,0 +1,136 @@
+#include <stdio.h>
+#include <string.h>
+#include <math.h>
+#include <stdlib.h>
+
+//constants
+#define INT_MAX 999999
+#define MAX_ROLLS 6
+#define BOARD_SIZE 100
+
+struct ladder {
+    int start;
+    int end;
+};
+
+struct snake {
+    int start;
+    int end;
+};
+
+int minAdj(int nadj, int adj[], int dist[]);
+
+int main () {
+    int T, n, m;
+    int i, t;
+    /*
+      read input
+     */
+    scanf("%d", &T);
+    scanf("%d", &n);
+    struct ladder lladders[n]; //array of ladders   
+    for (i = 0; i < n; i++) {
+	scanf("%d %d", &lladders[i].start, &lladders[i].end);
+    }
+    scanf("%d", &m);
+    struct snake lsnakes[m]; //array of snakes
+    for (i = 0; i < m; i++) {
+	scanf("%d %d", &lsnakes[i].start, &lsnakes[i].end);
+    }
+    /*
+      TESTING INPUT
+     */
+    printf("T = %d\nn = %d\nm = %d\n", T, n, m);
+    printf("ladders\n");
+    for (i = 0; i < n; i++) {
+	printf("%d %d\n", lladders[i].start, lladders[i].end);
+    }
+    printf("snakes\n");
+    for (i = 0; i < m; i++) {
+	printf("%d %d\n", lsnakes[i].start, lsnakes[i].end);
+    }    
+    
+    for (t = 0; t < T; t ++) {
+	/*
+	  Dijkstra's algorithm - shortest path
+	*/
+	int currNode = 1;
+	int destNode = 100;
+	int dist[BOARD_SIZE+1];
+	int visited[BOARD_SIZE+1];
+	//init arrays
+	dist[1] = 0;
+	visited[1] = 1;
+	for (i = 2; i <= BOARD_SIZE; i++) {
+	    dist[i] = INT_MAX;
+	    visited[i] = 0;
+	}
+	while (currNode != destNode) {
+	    //obtain adjacent nodes
+	    int adj[n+m+MAX_ROLLS]; //array of adjacent nodes
+	    /*
+	      update adj[] to contain all adjacent nodes that haven't been visited
+	      return value is the number of adjacent nodes
+	    */
+	    int nadj = 0; //number of adjacent nodes
+	    for (i = 0; i < 6; i++) {
+		if ( (currNode + i + 1) <= 100) {
+		    if (visited[currNode+i+1] == 0) {
+			adj[nadj] = currNode + i + 1;
+			nadj++;
+		    }
+		} else {
+		    break;
+		}
+	    }
+	    for (i = 0; i < n; i++) {
+		if (lladders[i].start == currNode) {
+		    if (visited[lladders[i].end] == 0) {
+			adj[nadj] = lladders[i].end;
+			nadj++;
+		    }
+		}
+	    }
+	    for (i = 0; i < m; i++) {
+		if (lsnakes[i].start == currNode) {
+		    if (visited[lsnakes[i].end] == 0) {
+			adj[nadj] = lsnakes[i].end;
+			nadj++;
+		    }
+		}
+	    }
+	    //check adjacent nodes
+	    int tmpDist = dist[currNode] + 1; //minimum distance of adj nodes
+	    for (i = 0; i < nadj; i++) {
+		if (dist[adj[i]] > tmpDist) {
+		    dist[adj[i]] = tmpDist;
+		}
+	    }
+	    //obtain next node
+	    currNode = minAdj(nadj, adj, dist); //return smallest distance as next node
+	    if (currNode == -1) {
+		printf("error in minAdj");
+		return -1;
+	    }
+	    visited[currNode] = 1; //update visited array
+	}
+	//print number of rolls
+	printf("%d\n", dist[destNode]);
+    }
+    return 0;
+}
+
+/*
+  returns the adjacent node with the smallest distance
+ */
+int minAdj(int nadj, int adj[], int dist[]) {
+    int i;
+    int min = INT_MAX;
+    int retNode = -1;
+    for (i = 0; i < nadj; i++) {
+	if (dist[adj[i]] < min) {
+	    retNode = adj[i];
+	}
+    }
+    return retNode;
+}
